@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Samuel</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #ffecd2, #fcb69f);
+    color: #333;
+    text-align: center;
+    padding: 50px;
+    overflow: hidden;
+  }
+  h1 { font-size: 3em; color: #e91e63; opacity: 0; animation: fadeIn 2s forwards; animation-delay: 1s; }
+  p { font-size: 1.5em; margin-top: 20px; }
+  .heart { color: red; font-size: 2em; animation: beat 1s infinite; }
+  @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+  @keyframes beat { 0%,100%{transform:scale(1);}50%{transform:scale(1.3);} }
+
+  .cake-container { position: relative; display: inline-block; margin-top: 30px; cursor: pointer; }
+  .cake { width: 200px; animation: float 3s ease-in-out infinite, glow 1s infinite alternate; border-radius: 15px; }
+  @keyframes float { 0%,100%{transform:translateY(0);}50%{transform:translateY(-15px);} }
+  @keyframes glow { 0% { box-shadow: 0 0 10px #ffd600;} 100% { box-shadow: 0 0 30px #ff9800;} }
+
+  .candle { position:absolute; top:20px; left:50%; transform:translateX(-50%); width:15px; height:40px; background:#ffeb3b; border-radius:5px; }
+  .flame { position:absolute; top:-15px; left:50%; transform:translateX(-50%); width:10px; height:15px; background:radial-gradient(circle,#ff5722,#ff9800,#ffd600); border-radius:50%; animation:flicker 0.2s infinite alternate; }
+  @keyframes flicker {0%{transform:translateX(-50%) scale(1);opacity:1;}50%{transform:translateX(-48%) scale(1.2);opacity:0.8;}100%{transform:translateX(-52%) scale(1);opacity:1;}}
+
+  .popup, .secret-message {
+    display: none; position: fixed; top:50%; left:50%; transform:translate(-50%, -50%);
+    background:white; border-radius:15px; padding:30px; box-shadow:0 0 20px rgba(0,0,0,0.3); z-index:10;
+  }
+  .popup h2, .secret-message h2 { color:#e91e63; }
+  .popup button, .secret-message button { margin-top:20px; padding:10px 20px; font-size:1em; border:none; border-radius:10px; background-color:#e91e63; color:white; cursor:pointer; }
+
+  .tanuja-pic { width:150px; border-radius:50%; margin-top:20px; border:3px solid #e91e63; display:none; }
+  #typedText { font-size:1.2em; color:#e91e63; margin-top:15px; min-height:80px; }
+
+  canvas { position:fixed; top:0; left:0; pointer-events:none; z-index:5; }
+</style>
+</head>
+<body>
+
+<h1>Happy Birthday, Samuel Manohar! <span class="heart">❤️</span></h1>
+
+<div class="cake-container" onclick="revealMessage()">
+  <img src="https://i.imgur.com/3s9YzSg.png" alt="Birthday Cake" class="cake">
+  <div class="candle"><div class="flame"></div></div>
+</div>
+
+<p>With all my love,</p>
+<p><strong>Tanuja 💖</strong></p>
+
+<div class="popup" id="popup">
+  <h2>Surprise! 🎉</h2>
+  <p>Click on the cake to reveal a secret heartfelt message! 🌟</p>
+  <button onclick="closePopup()">Close</button>
+</div>
+
+<div class="secret-message" id="secretMessage">
+  <h2>To My Beloved Samuel ❤️</h2>
+  <div id="typedText"></div>
+  <img src="https://i.imgur.com/yourPic.png" alt="Tanuja" class="tanuja-pic" id="tanujaPic">
+  <button onclick="closeSecret()">Close</button>
+</div>
+
+<audio id="bgMusic" autoplay loop>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="confetti"></canvas>
+<canvas id="hearts"></canvas>
+<canvas id="cakeSparkle"></canvas>
+
+<script>
+  // Popup
+  setTimeout(()=>{document.getElementById('popup').style.display='block';},3000);
+  function closePopup(){document.getElementById('popup').style.display='none';}
+
+  // Typing message
+  const message = "On your special day, I wish you endless happiness, laughter, and love. You are my everything, and my heart beats for you today and always. May all your dreams come true! 💖";
+  let index = 0;
+  function revealMessage(){
+    document.getElementById('secretMessage').style.display='block';
+    document.getElementById('tanujaPic').style.display='block';
+    index = 0;
+    document.getElementById('typedText').innerHTML='';
+    typeMessage();
+  }
+  function typeMessage(){
+    if(index < message.length){
+      document.getElementById('typedText').innerHTML += message.charAt(index);
+      index++;
+      setTimeout(typeMessage, 50);
+    }
+  }
+  function closeSecret(){document.getElementById('secretMessage').style.display='none';}
+
+  // Confetti
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  let W = window.innerWidth, H = window.innerHeight;
+  canvas.width=W; canvas.height=H;
+  const confettiCount=150, confetti=[];
+  for(let i=0;i<confettiCount;i++){confetti.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*6+2,d:Math.random()*confettiCount,color:`hsl(${Math.random()*360},100%,50%)`,tilt:Math.random()*10-10,tiltAngleIncrement:Math.random()*0.07+0.05,tiltAngle:0});}
+  function drawConfetti(){ctx.clearRect(0,0,W,H); confetti.forEach(c=>{ctx.beginPath(); ctx.lineWidth=c.r; ctx.strokeStyle=c.color; ctx.moveTo(c.x+c.tilt+c.r/2,c.y); ctx.lineTo(c.x+c.tilt,c.y+c.tilt+c.r/2); ctx.stroke();}); updateConfetti();}
+  function updateConfetti(){confetti.forEach(c=>{c.tiltAngle+=c.tiltAngleIncrement;c.y+=(Math.cos(c.d)+3+c.r/2)/2;c.tilt=Math.sin(c.tiltAngle)*15;if(c.y>H){c.y=-10;c.x=Math.random()*W;}});}
+  setInterval(drawConfetti,20);
+
+  // Hearts floating with rotation and sparkle
+  const heartCanvas = document.getElementById('hearts');
+  const hCtx = heartCanvas.getContext('2d');
+  heartCanvas.width=W; heartCanvas.height=H;
+  const heartsCount = 40;
+  const hearts = [];
+  for(let i=0;i<heartsCount;i++){
+    hearts.push({x:Math.random()*W, y:Math.random()*H, size:Math.random()*20+10, speed:Math.random()*1+0.5, angle:Math.random()*Math.PI*2, rotateSpeed:Math.random()*0.02+0.01, sparkle: Math.random()});
+  }
+  function drawHeartShape(ctx, x, y, size, angle, sparkle){
+    ctx.save(); ctx.translate(x, y); ctx.rotate(angle);
+    ctx.beginPath();
+    const topCurveHeight = size * 0.3;
+    ctx.moveTo(0, topCurveHeight);
+    ctx.bezierCurveTo(0, 0, -size/2, 0, -size/2, topCurveHeight);
+    ctx.bezierCurveTo(-size/2, (size+topCurveHeight)/2, 0, size, 0, size*1.25);
+    ctx.bezierCurveTo(0, size, size/2, (size+topCurveHeight)/2, size/2, topCurveHeight);
+    ctx.bezierCurveTo(size/2, 0, 0, 0, 0, topCurveHeight);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(255,0,0,${0.5 + 0.5*Math.sin(sparkle)})`;
+    ctx.fill(); ctx.restore();
+  }
+  function drawHearts(){hCtx.clearRect(0,0,W,H); hearts.forEach(h=>{drawHeartShape(hCtx,h.x,h.y,h.size,h.angle,h.sparkle); h.y -= h.speed; h.angle += h.rotateSpeed; h.sparkle += 0.1; if(h.y < -h.size){ h.y = H + h.size; h.x = Math.random()*W;}}); requestAnimationFrame(drawHearts);}
+  drawHearts();
+
+  // Cake sparkle
+  const cakeCanvas = document.getElementById('cakeSparkle');
+  const cCtx = cakeCanvas.getContext('2d');
+  cakeCanvas.width=W; cakeCanvas.height=H;
+  const sparkles = [];
+  const cakeElem = document.querySelector('.cake-container');
+  for(let i=0;i<60;i++){sparkles.push({x:0,y:0,r:Math.random()*3+1,dx:Math.random()*2-1,dy:Math.random()*-2-1, alpha:Math.random()});}
+  function drawCakeSparkle(){
+    const rect = cakeElem.getBoundingClientRect();
+    cCtx.clearRect(0,0,W,H);
+    sparkles.forEach(s=>{
+      s.x += s.dx; s.y += s.dy; s.alpha -= 0.01;
+      if(s.alpha <=0){ s.x = rect.left + rect.width/2 + (Math.random()-0.5)*rect.width; s.y = rect.top + rect.height/2 + (Math.random()-0.5)*rect.height; s.alpha = 1; s.dx = Math.random()*2-1; s.dy = Math.random()*-2-1; }
+      cCtx.fillStyle=`rgba(255,255,255,${s.alpha})`; cCtx.beginPath(); cCtx.arc(s.x,s.y,s.r,0,Math.PI*2); cCtx.fill();
+    });
+    requestAnimationFrame(drawCakeSparkle);
+  }
+  drawCakeSparkle();
+
+  window.addEventListener('resize',()=>{W=window.innerWidth;H=window.innerHeight; canvas.width=W; canvas.height=H; heartCanvas.width=W; heartCanvas.height=H; cakeCanvas.width=W; cakeCanvas.height=H;});
+</script>
+
+</body>
+</html>
